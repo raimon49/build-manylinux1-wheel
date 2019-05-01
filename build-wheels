@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e # エラー時に終了するようにする
+set -x # 実行されるコマンドを表示する
+
+# wheelをビルドする
+/opt/python/cp36-cp36m/bin/pip wheel -f /io/wheelhouse -w /io/wheelhouse -r /io/requirements.txt
+
+# C拡張を含むwheelをmanylinux wheelへ変換する
+for wheel in /io/wheelhouse/*-linux_x86_64.whl
+do
+    auditwheel repair -w /io/wheelhouse ${wheel}
+done
+
+# 変換前のwheelを削除する
+find /io/wheelhouse \
+    -name '*-linux_x86_64.whl' \
+    -exec rm -v {} +
